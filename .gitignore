@@ -1,0 +1,15 @@
+# .gitignore for my-dashboard-docker
+*.env
+*.env.*
+*.log
+*.tmp
+*.bak
+mysql/*.sql
+mysql/data/
+nginx/logs/
+.DS_Store
+.idea/
+Thumbs.db
+build/
+dist/
+cache/
