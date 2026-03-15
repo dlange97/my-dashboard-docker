@@ -22,14 +22,29 @@ services:
           "mysqladmin",
           "ping",
           "-h",
-          "localhost",
+          "127.0.0.1",
           "-u",
           "root",
           "-p${MYSQL_ROOT_PASSWORD:-root_secret}",
+          "--silent",
         ]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 5
+      start_period: 60s
+      retries: 30
+    networks:
+      - mydashboard
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: mydashboard-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - mydashboard
 
