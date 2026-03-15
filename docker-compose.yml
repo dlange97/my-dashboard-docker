@@ -33,6 +33,19 @@ services:
     networks:
       - mydashboard
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: mydashboard-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - mydashboard
+
   # ─── Auth Service (PHP-FPM) ───────────────────────────────
   auth-php:
     build:
@@ -43,6 +56,8 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      rabbitmq:
+        condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
       APP_SECRET: ${AUTH_APP_SECRET:-auth_secret_change_me}
@@ -54,8 +69,10 @@ services:
       CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1)(:[0-9]+)?$$"
       NOTIFICATION_SERVICE_URL: "http://nginx"
       INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:-internal_notification_token_change_me}
+      MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2f/messages"
     volumes:
       - ../my-dashboard-backend/auth-service:/app
+      - ../my-dashboard-backend/shared-bundle:/shared-bundle
       - auth_vendor:/app/vendor
       - jwt_keys:/app/config/jwt
     networks:
@@ -84,6 +101,7 @@ services:
       AUTH_SERVICE_URL: "http://auth-php:9000"
     volumes:
       - ../my-dashboard-backend/dashboard-service:/app
+      - ../my-dashboard-backend/shared-bundle:/shared-bundle
       - dashboard_vendor:/app/vendor
       - jwt_keys:/app/config/jwt:ro
     networks:
@@ -101,6 +119,8 @@ services:
         condition: service_healthy
       auth-php:
         condition: service_started
+      rabbitmq:
+        condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
       APP_SECRET: ${EVENTS_APP_SECRET:-events_secret_change_me}
@@ -112,6 +132,7 @@ services:
       AUTH_SERVICE_URL: "http://auth-php:9000"
     volumes:
       - ../my-dashboard-backend/events-service:/app
+      - ../my-dashboard-backend/shared-bundle:/shared-bundle
       - events_vendor:/app/vendor
       - jwt_keys:/app/config/jwt:ro
     networks:
@@ -138,8 +159,51 @@ services:
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
       CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1)(:[0-9]+)?$$"
       INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:-internal_notification_token_change_me}
+      MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2f/messages"
     volumes:
       - ../my-dashboard-backend/notification-service:/app
+      - ../my-dashboard-backend/shared-bundle:/shared-bundle
+      - notification_vendor:/app/vendor
+      - jwt_keys:/app/config/jwt:ro
+    networks:
+      - mydashboard
+
+  notification-worker:
+    build:
+      context: ../my-dashboard-backend/notification-service
+      dockerfile: Dockerfile
+    container_name: mydashboard-notification-worker
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      notification-php:
+        condition: service_started
+    environment:
+      APP_ENV: ${APP_ENV:-dev}
+      APP_SECRET: ${NOTIFICATION_APP_SECRET:-notification_secret_change_me}
+      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-secret}@mysql:3306/notifications?serverVersion=8.4&charset=utf8mb4"
+      JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
+      JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
+      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1)(:[0-9]+)?$$"
+      INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:-internal_notification_token_change_me}
+      MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2f/messages"
+    command:
+      [
+        "php",
+        "bin/console",
+        "messenger:consume",
+        "async",
+        "--time-limit=3600",
+        "--memory-limit=128M",
+        "--no-interaction",
+      ]
+    volumes:
+      - ../my-dashboard-backend/notification-service:/app
+      - ../my-dashboard-backend/shared-bundle:/shared-bundle
       - notification_vendor:/app/vendor
       - jwt_keys:/app/config/jwt:ro
     networks:
