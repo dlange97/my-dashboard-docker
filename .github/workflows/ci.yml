@@ -17,6 +17,3 @@ jobs:
 
       - name: Validate docker compose file
         run: docker compose -f docker-compose.yml config
-
-  cross-repo-smoke:
-    uses: dlange97/helper-scripts/.github/workflows/smoke.yml@develop
