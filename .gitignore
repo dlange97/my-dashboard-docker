@@ -1,6 +1,8 @@
 # .gitignore for my-dashboard-docker
-*.env
-*.env.*
+.env.dev
+.env.*.dev
+.env.local
+.env.*.local
 *.log
 *.tmp
 *.bak
