@@ -141,8 +141,8 @@ services:
   # ─── Notification Service (PHP-FPM) ───────────────────────
   notification-php:
     build:
-      context: ../my-dashboard-backend/notification-service
-      dockerfile: Dockerfile
+      context: ../my-dashboard-backend
+      dockerfile: notification-service/Dockerfile
     container_name: mydashboard-notification-php
     restart: unless-stopped
     depends_on:
@@ -170,8 +170,8 @@ services:
 
   notification-worker:
     build:
-      context: ../my-dashboard-backend/notification-service
-      dockerfile: Dockerfile
+      context: ../my-dashboard-backend
+      dockerfile: notification-service/Dockerfile
     container_name: mydashboard-notification-worker
     restart: unless-stopped
     depends_on:
