@@ -66,7 +66,7 @@ services:
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
       JWT_TOKEN_TTL: "3600"
-      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.local)(:[0-9]+)?$$"
+      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
       NOTIFICATION_SERVICE_URL: "http://nginx"
       INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:-internal_notification_token_change_me}
       MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2f/messages"
@@ -97,7 +97,7 @@ services:
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
-      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.local)(:[0-9]+)?$$"
+      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
       AUTH_SERVICE_URL: "http://auth-php:9000"
     volumes:
       - ../my-dashboard-backend/dashboard-service:/app
@@ -128,7 +128,7 @@ services:
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
-      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.local)(:[0-9]+)?$$"
+      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
       AUTH_SERVICE_URL: "http://auth-php:9000"
     volumes:
       - ../my-dashboard-backend/events-service:/app
@@ -157,7 +157,7 @@ services:
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
-      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.local)(:[0-9]+)?$$"
+      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
       INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:-internal_notification_token_change_me}
       MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2f/messages"
     volumes:
@@ -188,7 +188,7 @@ services:
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
-      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.local)(:[0-9]+)?$$"
+      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
       INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:-internal_notification_token_change_me}
       MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2f/messages"
     command:
@@ -228,7 +228,7 @@ services:
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
-      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.local)(:[0-9]+)?$$"
+      CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
     volumes:
       - ../my-dashboard-backend/translation-service:/app
       - ../my-dashboard-backend/shared-bundle:/shared-bundle
@@ -249,7 +249,7 @@ services:
       - notification-php
       - translation-php
     ports:
-      - "8081:80"
+      - "80:80"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
@@ -262,13 +262,10 @@ services:
       dockerfile: Dockerfile
     container_name: mydashboard-frontend
     restart: unless-stopped
-    ports:
-      - "3000:3000"
     volumes:
       - ../my-dashboard-frontend:/app
       - frontend_node_modules:/app/node_modules
     environment:
-      VITE_API_URL: http://localhost:8081/api
       VITE_PROXY_TARGET: "http://nginx:80"
     networks:
       - mydashboard
