@@ -7,14 +7,15 @@ services:
     container_name: mydashboard-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_secret}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required — copy .env.example to .env and set a strong value}
       MYSQL_USER: ${MYSQL_USER:-app}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?MYSQL_PASSWORD is required — copy .env.example to .env and set a strong value}
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf:ro
     healthcheck:
       test:
         [
@@ -25,7 +26,7 @@ services:
           "localhost",
           "-u",
           "root",
-          "-p${MYSQL_ROOT_PASSWORD:-root_secret}",
+          "-p${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}",
         ]
       interval: 10s
       timeout: 5s
@@ -38,11 +39,11 @@ services:
     container_name: mydashboard-rabbitmq
     restart: unless-stopped
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER is required — copy .env.example to .env and set a value}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS is required — copy .env.example to .env and set a strong value}
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
     networks:
       - mydashboard
 
@@ -60,16 +61,16 @@ services:
         condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
-      APP_SECRET: ${AUTH_APP_SECRET:-auth_secret_change_me}
-      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-secret}@mysql:3306/auth?serverVersion=8.4&charset=utf8mb4"
+      APP_SECRET: ${AUTH_APP_SECRET:?AUTH_APP_SECRET is required — copy .env.example to .env and set a strong value}
+      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}@mysql:3306/auth?serverVersion=8.4&charset=utf8mb4"
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
-      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is required — copy .env.example to .env and set a strong value}
       JWT_TOKEN_TTL: "3600"
       CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
       NOTIFICATION_SERVICE_URL: "http://nginx"
-      INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:-internal_notification_token_change_me}
-      MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2f/messages"
+      INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:?INTERNAL_NOTIFICATION_TOKEN is required — copy .env.example to .env and set a strong value}
+      MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER is required}:${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS is required}@rabbitmq:5672/%2f/messages"
     volumes:
       - ../my-dashboard-backend/auth-service:/app
       - ../my-dashboard-backend/shared-bundle:/shared-bundle
@@ -92,11 +93,11 @@ services:
         condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
-      APP_SECRET: ${DASHBOARD_APP_SECRET:-dashboard_secret_change_me}
-      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-secret}@mysql:3306/dashboard?serverVersion=8.4&charset=utf8mb4"
+      APP_SECRET: ${DASHBOARD_APP_SECRET:?DASHBOARD_APP_SECRET is required — copy .env.example to .env and set a strong value}
+      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}@mysql:3306/dashboard?serverVersion=8.4&charset=utf8mb4"
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
-      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is required}
       CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
       AUTH_SERVICE_URL: "http://auth-php:9000"
     volumes:
@@ -123,11 +124,11 @@ services:
         condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
-      APP_SECRET: ${EVENTS_APP_SECRET:-events_secret_change_me}
-      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-secret}@mysql:3306/events?serverVersion=8.4&charset=utf8mb4"
+      APP_SECRET: ${EVENTS_APP_SECRET:?EVENTS_APP_SECRET is required — copy .env.example to .env and set a strong value}
+      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}@mysql:3306/events?serverVersion=8.4&charset=utf8mb4"
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
-      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is required}
       CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
       AUTH_SERVICE_URL: "http://auth-php:9000"
     volumes:
@@ -152,14 +153,14 @@ services:
         condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
-      APP_SECRET: ${NOTIFICATION_APP_SECRET:-notification_secret_change_me}
-      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-secret}@mysql:3306/notifications?serverVersion=8.4&charset=utf8mb4"
+      APP_SECRET: ${NOTIFICATION_APP_SECRET:?NOTIFICATION_APP_SECRET is required — copy .env.example to .env and set a strong value}
+      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}@mysql:3306/notifications?serverVersion=8.4&charset=utf8mb4"
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
-      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is required}
       CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
-      INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:-internal_notification_token_change_me}
-      MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2f/messages"
+      INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:?INTERNAL_NOTIFICATION_TOKEN is required}
+      MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER is required}:${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS is required}@rabbitmq:5672/%2f/messages"
     volumes:
       - ../my-dashboard-backend/notification-service:/app
       - ../my-dashboard-backend/shared-bundle:/shared-bundle
@@ -183,14 +184,14 @@ services:
         condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
-      APP_SECRET: ${NOTIFICATION_APP_SECRET:-notification_secret_change_me}
-      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-secret}@mysql:3306/notifications?serverVersion=8.4&charset=utf8mb4"
+      APP_SECRET: ${NOTIFICATION_APP_SECRET:?NOTIFICATION_APP_SECRET is required}
+      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}@mysql:3306/notifications?serverVersion=8.4&charset=utf8mb4"
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
-      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is required}
       CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
-      INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:-internal_notification_token_change_me}
-      MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:-guest}:${RABBITMQ_DEFAULT_PASS:-guest}@rabbitmq:5672/%2f/messages"
+      INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:?INTERNAL_NOTIFICATION_TOKEN is required}
+      MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER is required}:${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS is required}@rabbitmq:5672/%2f/messages"
     command:
       [
         "php",
@@ -223,11 +224,11 @@ services:
         condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
-      APP_SECRET: ${TRANSLATION_APP_SECRET:-translation_secret_change_me}
-      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:-secret}@mysql:3306/translations?serverVersion=8.4&charset=utf8mb4"
+      APP_SECRET: ${TRANSLATION_APP_SECRET:?TRANSLATION_APP_SECRET is required — copy .env.example to .env and set a strong value}
+      DATABASE_URL: "mysql://${MYSQL_USER:-app}:${MYSQL_PASSWORD:?MYSQL_PASSWORD is required}@mysql:3306/translations?serverVersion=8.4&charset=utf8mb4"
       JWT_SECRET_KEY: "%kernel.project_dir%/config/jwt/private.pem"
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
-      JWT_PASSPHRASE: ${JWT_PASSPHRASE:-mydashboard_jwt_pass}
+      JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is required}
       CORS_ALLOW_ORIGIN: "^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$"
     volumes:
       - ../my-dashboard-backend/translation-service:/app
