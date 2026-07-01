@@ -103,6 +103,18 @@ services:
       AUTH_SERVICE_URL: "http://auth-php:9000"
       NOTIFICATION_SERVICE_URL: "http://nginx"
       INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:?INTERNAL_NOTIFICATION_TOKEN is required}
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      AI_MODEL: ${AI_MODEL:-}
+      AI_SEARCH_DEFAULT_LIMIT: ${AI_SEARCH_DEFAULT_LIMIT:-5}
+      AI_SEARCH_MAX_LIMIT: ${AI_SEARCH_MAX_LIMIT:-100}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_API_URL: ${ANTHROPIC_API_URL:-https://api.anthropic.com/v1/messages}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-3-5-sonnet-latest}
+      AWS_BEDROCK_REGION: ${AWS_BEDROCK_REGION:-eu-central-1}
+      AWS_BEDROCK_ACCESS_KEY_ID: ${AWS_BEDROCK_ACCESS_KEY_ID:-}
+      AWS_BEDROCK_SECRET_ACCESS_KEY: ${AWS_BEDROCK_SECRET_ACCESS_KEY:-}
+      AWS_BEDROCK_SESSION_TOKEN: ${AWS_BEDROCK_SESSION_TOKEN:-}
+      AWS_BEDROCK_MODEL: ${AWS_BEDROCK_MODEL:-anthropic.claude-3-5-sonnet-20240620-v1:0}
     volumes:
       - ../my-dashboard-backend/dashboard-service:/app
       - ../my-dashboard-backend/shared-bundle:/shared-bundle
