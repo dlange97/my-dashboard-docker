@@ -72,6 +72,12 @@ services:
       NOTIFICATION_SERVICE_URL: "http://nginx"
       INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:?INTERNAL_NOTIFICATION_TOKEN is required — copy .env.example to .env and set a strong value}
       MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_DEFAULT_USER:?RABBITMQ_DEFAULT_USER is required}:${RABBITMQ_DEFAULT_PASS:?RABBITMQ_DEFAULT_PASS is required}@rabbitmq:5672/%2f/messages"
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      XDEBUG_START_WITH_REQUEST: ${XDEBUG_START_WITH_REQUEST:-trigger}
+      XDEBUG_CLIENT_HOST: ${XDEBUG_CLIENT_HOST:-host.docker.internal}
+      XDEBUG_CLIENT_PORT: ${XDEBUG_CLIENT_PORT:-9003}
+      XDEBUG_IDEKEY: ${XDEBUG_IDEKEY:-VSCODE}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=auth-service}
     volumes:
       - ../my-dashboard-backend/auth-service:/app
       - ../my-dashboard-backend/shared-bundle:/shared-bundle
@@ -115,6 +121,12 @@ services:
       AWS_BEDROCK_SECRET_ACCESS_KEY: ${AWS_BEDROCK_SECRET_ACCESS_KEY:-}
       AWS_BEDROCK_SESSION_TOKEN: ${AWS_BEDROCK_SESSION_TOKEN:-}
       AWS_BEDROCK_MODEL: ${AWS_BEDROCK_MODEL:-anthropic.claude-3-5-sonnet-20240620-v1:0}
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      XDEBUG_START_WITH_REQUEST: ${XDEBUG_START_WITH_REQUEST:-trigger}
+      XDEBUG_CLIENT_HOST: ${XDEBUG_CLIENT_HOST:-host.docker.internal}
+      XDEBUG_CLIENT_PORT: ${XDEBUG_CLIENT_PORT:-9003}
+      XDEBUG_IDEKEY: ${XDEBUG_IDEKEY:-VSCODE}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=dashboard-service}
     volumes:
       - ../my-dashboard-backend/dashboard-service:/app
       - ../my-dashboard-backend/shared-bundle:/shared-bundle
@@ -148,6 +160,12 @@ services:
       AUTH_SERVICE_URL: "http://auth-php:9000"
       NOTIFICATION_SERVICE_URL: "http://nginx"
       INTERNAL_NOTIFICATION_TOKEN: ${INTERNAL_NOTIFICATION_TOKEN:?INTERNAL_NOTIFICATION_TOKEN is required}
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      XDEBUG_START_WITH_REQUEST: ${XDEBUG_START_WITH_REQUEST:-trigger}
+      XDEBUG_CLIENT_HOST: ${XDEBUG_CLIENT_HOST:-host.docker.internal}
+      XDEBUG_CLIENT_PORT: ${XDEBUG_CLIENT_PORT:-9003}
+      XDEBUG_IDEKEY: ${XDEBUG_IDEKEY:-VSCODE}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=events-service}
     volumes:
       - ../my-dashboard-backend/events-service:/app
       - ../my-dashboard-backend/shared-bundle:/shared-bundle
@@ -184,6 +202,12 @@ services:
       NOTIFICATION_PUSH_PROVIDER: ${NOTIFICATION_PUSH_PROVIDER:-log}
       NOTIFICATION_PUSH_API_URL: ${NOTIFICATION_PUSH_API_URL:-}
       NOTIFICATION_PUSH_API_KEY: ${NOTIFICATION_PUSH_API_KEY:-}
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      XDEBUG_START_WITH_REQUEST: ${XDEBUG_START_WITH_REQUEST:-trigger}
+      XDEBUG_CLIENT_HOST: ${XDEBUG_CLIENT_HOST:-host.docker.internal}
+      XDEBUG_CLIENT_PORT: ${XDEBUG_CLIENT_PORT:-9003}
+      XDEBUG_IDEKEY: ${XDEBUG_IDEKEY:-VSCODE}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=notification-service}
     volumes:
       - ../my-dashboard-backend/notification-service:/app
       - ../my-dashboard-backend/shared-bundle:/shared-bundle
@@ -221,6 +245,12 @@ services:
       NOTIFICATION_PUSH_PROVIDER: ${NOTIFICATION_PUSH_PROVIDER:-log}
       NOTIFICATION_PUSH_API_URL: ${NOTIFICATION_PUSH_API_URL:-}
       NOTIFICATION_PUSH_API_KEY: ${NOTIFICATION_PUSH_API_KEY:-}
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      XDEBUG_START_WITH_REQUEST: ${XDEBUG_START_WITH_REQUEST:-trigger}
+      XDEBUG_CLIENT_HOST: ${XDEBUG_CLIENT_HOST:-host.docker.internal}
+      XDEBUG_CLIENT_PORT: ${XDEBUG_CLIENT_PORT:-9003}
+      XDEBUG_IDEKEY: ${XDEBUG_IDEKEY:-VSCODE}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=notification-service}
     command:
       [
         "php",
@@ -259,6 +289,12 @@ services:
       JWT_PUBLIC_KEY: "%kernel.project_dir%/config/jwt/public.pem"
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE is required}
       CORS_ALLOW_ORIGIN: "${CORS_ALLOW_ORIGIN:-^https?://(localhost|127\\.0\\.0\\.1|[a-z0-9-]+\\.mydashboard\\.(local|com))(:[0-9]+)?$$}"
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      XDEBUG_START_WITH_REQUEST: ${XDEBUG_START_WITH_REQUEST:-trigger}
+      XDEBUG_CLIENT_HOST: ${XDEBUG_CLIENT_HOST:-host.docker.internal}
+      XDEBUG_CLIENT_PORT: ${XDEBUG_CLIENT_PORT:-9003}
+      XDEBUG_IDEKEY: ${XDEBUG_IDEKEY:-VSCODE}
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG:-serverName=translation-service}
     volumes:
       - ../my-dashboard-backend/translation-service:/app
       - ../my-dashboard-backend/shared-bundle:/shared-bundle
